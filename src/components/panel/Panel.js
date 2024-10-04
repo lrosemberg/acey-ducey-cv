@@ -59,9 +59,13 @@ const Panel = ({ title, cards, grouped = true }) => {
 
   return (
     <div className="panel">
-      <h2>{title} <span className="card-count">({cards.length})</span></h2>
-      <div className="scrollable-list">
-        {grouped ? renderGroupedCards() : renderUngroupedCards()}
+      <div className="panel-header">
+        <h2>{title} <span className="card-count">({cards.length})</span></h2>
+      </div>
+      <div className="panel-content">
+        <div className="scrollable-list">
+          {grouped ? renderGroupedCards() : renderUngroupedCards()}
+        </div>
       </div>
     </div>
   );

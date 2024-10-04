@@ -5,11 +5,15 @@
   --background-color: #f9fafb;
   --text-color: #111827;
   --card-background: #ffffff;
-  --border-color: #e5e7eb;
+  --border-color: rgb(221 214 254);
   --button-bg: #ffffff;
   --button-text: #7c3aed;
   --button-border: #7c3aed;
   --button-shadow: 0 2px 4px rgba(117, 0, 243, 0.25);
+  --panel-shadow: rgb(221, 214, 254) 0px 0px 30px 0px;
+  --header-background: rgb(245 243 255 / 1);
+  --panel-header-background: rgb(245 243 255 / 0.5);
+
 }
 
 [data-theme="dark"] {
@@ -23,6 +27,9 @@
   --button-text: rgba(0, 255, 206, 1);
   --button-border: rgba(0, 255, 206, 1);
   --button-shadow: 0px 0px 8px 0px rgba(0, 255, 206, 0.25);
+  --panel-shadow: 0px;
+  --header-background: #2d3748;
+  --panel-header-background: #2d3748;
 }
 
 /* Global Styles */
@@ -77,16 +84,18 @@ button:focus {
 }
 
 .center-panel {
+
   display: flex;
   flex-direction: column;
   align-items: center;
   background-color: var(--card-background);
   border-radius: 8px;
   padding: 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--panel-shadow);
   height: calc(100vh - 40px - 70px);
   overflow-y: auto;
   box-sizing: border-box;
+  border: 1px solid var(--border-color);
 }
 
 .footer {

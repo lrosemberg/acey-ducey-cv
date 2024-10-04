@@ -3,11 +3,12 @@
     justify-content: space-between;
     align-items: center;
     padding: 1rem 2rem;
-    background-color: var(--card-background);
+    background-color: var(--header-background);
     color: var(--text-color);
     width: 100%;
     box-sizing: border-box;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--panel-shadow);
+    border-bottom: 1px solid var(--border-color);
     height: 70px;
 }
 
@@ -15,4 +16,20 @@
     margin: 0;
     font-size: 1.8rem;
     font-weight: bold;
+}
+
+.logo {
+    height: 50px;
+    width: auto;
+    margin-right: 15px;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
 }

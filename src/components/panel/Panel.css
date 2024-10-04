@@ -1,20 +1,28 @@
 .panel {
     background-color: var(--card-background);
-    padding: 20px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
+    box-shadow: var(--panel-shadow);
+    border-radius: 0.5rem;
     height: calc(50vh - 25px - 40px);
     overflow-y: auto;
     box-sizing: border-box;
     color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+.panel-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color);
+    background-color: var(--panel-header-background);
+}
+
+.panel-content {
+    padding: 5px 20px 20px 20px;
 }
 
 .panel h2 {
     color: var(--text-color);
-    border-bottom: 2px solid var(--primary-color);
-    padding-bottom: 10px;
-    margin-bottom: 10px;
     margin-top: 0px;
+    margin-bottom: 0px;
 }
 
 .scrollable-list {
@@ -46,8 +54,8 @@
     align-items: center;
     background-color: var(--card-group-bg);
     border-radius: 5px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     padding: 5px 10px;
+    border: 1px solid var(--border-color);
 }
   
 .card-value {
