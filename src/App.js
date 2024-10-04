@@ -4,6 +4,7 @@ import Panel from './components/panel/Panel';
 import Table from './components/table/Table';
 import Cards from './components/cards/Cards';
 import ThemeToggle from './components/theme-toggle/ThemeToggle';
+import Header from './components/header/Header';
 import winnerGif from './assets/images/winner.gif';
 import loserGif from './assets/images/loser.gif';
 import { getCardColor, getSuitSymbol } from './utils/cardUtils';
@@ -238,6 +239,7 @@ function App() {
 
   return (
     <div className="App">
+      <Header toggleTheme={toggleTheme} isDarkMode={isDarkMode} />
       <div className="panels-container">
         <div className="side-panels">
           <Panel title="Played Cards" cards={playedCards} grouped={false} />
@@ -274,9 +276,6 @@ function App() {
           </div>
           <div className="footer">
             <button onClick={resetGame}>Reset Game</button>
-            <div className="theme-toggle-container">
-              <ThemeToggle isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
-            </div>
           </div>
           {gameResult === 'win' && (
             <div className="result-overlay fade-out">

@@ -3,7 +3,7 @@
     padding: 20px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
-    height: calc(50vh - 25px);
+    height: calc(50vh - 25px - 40px);
     overflow-y: auto;
     box-sizing: border-box;
     color: var(--text-color);
