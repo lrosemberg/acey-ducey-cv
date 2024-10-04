@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/acey-ducey-cv/static/css/main.ffddea5d.css",
-    "main.js": "/acey-ducey-cv/static/js/main.b491d687.js",
+    "main.js": "/acey-ducey-cv/static/js/main.c1f464fd.js",
     "static/media/winner.gif": "/acey-ducey-cv/static/media/winner.db6b75dc6bef025a5c13.gif",
     "static/media/loser.gif": "/acey-ducey-cv/static/media/loser.4e90436f2473ec003f97.gif",
     "index.html": "/acey-ducey-cv/index.html",
     "main.ffddea5d.css.map": "/acey-ducey-cv/static/css/main.ffddea5d.css.map",
-    "main.b491d687.js.map": "/acey-ducey-cv/static/js/main.b491d687.js.map"
+    "main.c1f464fd.js.map": "/acey-ducey-cv/static/js/main.c1f464fd.js.map"
   },
   "entrypoints": [
     "static/css/main.ffddea5d.css",
-    "static/js/main.b491d687.js"
+    "static/js/main.c1f464fd.js"
   ]
 }
