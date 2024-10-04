@@ -73,6 +73,9 @@ function App() {
     if (step === 0 && drawnCard.value === 'A') {
       setAceBeingSelected(true);
       setCurrentCards([drawnCard, null, null]);
+    } else if (step === 1 && drawnCard.value === 'A') {
+      // If the second card is an Ace, it's always the highest card
+      advanceStep({ ...drawnCard, value: 'A(H)' });
     } else {
       advanceStep(drawnCard);
     }
