@@ -68,7 +68,14 @@ const Table = ({ onPredictions }) => {
             if (inferEngine && workerId && videoRef.current && canvasRef.current && videoLoaded) {
                 try {
                     const img = new window.inferencejs.CVImage(videoRef.current);
-                    const predictions = await inferEngine.infer(workerId, img);
+                    let predictions = await inferEngine.infer(workerId, img);
+
+                    // Sort predictions by x-axis and remove duplicates
+                    predictions = predictions
+                        .sort((a, b) => a.bbox.x - b.bbox.x)
+                        .filter((pred, index, self) =>
+                            index === self.findIndex((t) => t.class === pred.class)
+                        );
 
                     onPredictions(predictions);
 
