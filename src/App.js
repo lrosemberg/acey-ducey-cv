@@ -198,9 +198,9 @@ function App() {
   };
 
   const getProbabilityColor = (probability) => {
-    if (probability < 33.33) return 'red';
-    if (probability < 66.66) return 'orange';
-    return 'green';
+    if (probability < 33.33) return 'probability-red';
+    if (probability < 66.66) return 'probability-orange';
+    return 'probability-green';
   };
 
   const handlePredictions = (predictions) => {
@@ -251,9 +251,15 @@ function App() {
                 </div>
               )}
               {winProbability && (
-                <p style={{ color: getProbabilityColor(parseFloat(winProbability)) }}>
-                  Win probability: {winProbability}%
-                </p>
+                <div className="win-probability">
+                  <span className="win-probability-label">Win probability: </span>
+                  <span 
+                    className="win-probability-value"
+                    style={{ color: getProbabilityColor(parseFloat(winProbability)) }}
+                  >
+                    {winProbability}%
+                  </span>
+                </div>
               )} 
             </div>
           </div>

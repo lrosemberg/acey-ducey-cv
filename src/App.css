@@ -5,10 +5,10 @@
   --text-color: #111827;
   --card-background: #ffffff;
   --border-color: #e5e7eb;
-  --button-bg: #7c3aed;
-  --button-text: #ffffff;
+  --button-bg: #ffffff;
+  --button-text: #7c3aed;
   --button-border: #7c3aed;
-  --button-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --button-shadow: 0 2px 4px rgba(117, 0, 243, 0.25);
 }
 
 [data-theme="dark"] {
@@ -44,11 +44,9 @@ button {
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: var(--button-shadow);
+  font-weight: 500;
 }
 
-button:hover {
-  opacity: 0.8;
-}
 
 [data-theme="dark"] button {
   text-shadow: 0 0 5px var(--button-text);
@@ -123,16 +121,16 @@ button:focus {
 
 /* Ace Choice */
 .ace-choice-container {
-  margin-top: 15px;
   margin-bottom: 15px;
   text-align: center;
   width: 100%;
+  font-weight: 500;
 }
 
 .ace-choice-container p {
   margin-bottom: 10px;
   font-size: 18px;
-  color: #333;
+  color: var(--text-color);
 }
 
 .ace-choice-container button {
@@ -236,4 +234,33 @@ button:focus {
   width: 28px;
   height: 28px;
   top: 3px;
+}
+
+.win-probability {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.win-probability-label {
+  margin-right: 5px;
+}
+
+.win-probability-value {
+  font-weight: bold;
+}
+
+.probability-red {
+  color: #ff4d4d;
+}
+
+.probability-orange {
+  color: #e09812;
+}
+
+.probability-green {
+  color: #4caf50;
 }
