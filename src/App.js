@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
-import Panel from './components/Panel';
+import Panel from './components/panel/Panel';
+import Table from './components/table/Table';
+import Cards from './components/cards/Cards';
 import winnerGif from './assets/images/winner.gif';
 import loserGif from './assets/images/loser.gif';
 
@@ -174,6 +176,10 @@ function App() {
     return 'green';
   };
 
+  const handlePredictions = (predictions) => {
+    console.log('Predictions:', predictions);
+  };
+
   return (
     <div className="App">
       <div className="panels-container">
@@ -184,13 +190,13 @@ function App() {
 
         <div className="center-panel">
           <div className="cards-container">
-            <div className="cards">
-              {[currentCards[0], currentCards[2], currentCards[1]].map((card, index) => (
-                <div key={index} className="card" style={{ color: card ? getCardColor(card.suit) : 'black' }}>
-                  {card ? `${card.value} ${card.suit}` : 'Card'}
-                </div>
-              ))}
+            <div className="table-container">
+              <Table onPredictions={handlePredictions} />
             </div>
+            <Cards 
+              currentCards={currentCards}
+              getCardColor={getCardColor}
+            />
             <div className="commands-container">
               {!aceBeingSelected && deck.length > 0 && (
                 <button onClick={drawNextCard}>

@@ -39,12 +39,6 @@ button:focus {
   box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.5);
 }
 
-p {
-  font-size: 20px;
-  font-weight: bold;
-  color: #28a745;
-}
-
 /* Layout */
 .panels-container {
   display: grid;
@@ -91,28 +85,6 @@ p {
   margin-bottom: 20px;
   width: 100%;
   align-items: center;
-}
-
-.cards {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  margin-bottom: 20px;
-  width: 100%;
-}
-
-.card {
-  width: 200px;
-  height: 300px;
-  border: 1px solid var(--border-color);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 56px;
-  background-color: var(--card-background);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
-  transition: transform 0.2s ease-in-out;
 }
 
 /* Commands */
@@ -175,23 +147,4 @@ p {
     fadeIn 0.5s ease-out forwards,
     fadeOut 0.5s ease-out 1.5s forwards;
   opacity: 0;
-}
-
-/* Scrollbar Styles */
-::-webkit-scrollbar {
-  width: 10px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 5px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 5px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #555;
 }
