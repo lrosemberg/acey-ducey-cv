@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import './Table.css';
 
-const CONFIDENCE_THRESHOLD = 0.6;
+const CONFIDENCE_THRESHOLD = 0.7;
 
 const Table = ({ onPredictions }) => {
     const videoRef = useRef(null);
