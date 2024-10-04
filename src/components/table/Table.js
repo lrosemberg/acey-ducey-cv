@@ -1,5 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import './Table.css';
+
+const CONFIDENCE_THRESHOLD = 0.5;
 
 const Table = ({ onPredictions }) => {
     const videoRef = useRef(null);
@@ -9,6 +11,54 @@ const Table = ({ onPredictions }) => {
     const [workerId, setWorkerId] = useState(null);
     const [devices, setDevices] = useState([]);
     const [selectedDeviceId, setSelectedDeviceId] = useState('');
+    const lastDetectTimeRef = useRef(0);
+    const detectFrameRef = useRef(null);
+
+    const detectFrame = useCallback(async () => {
+        if (!inferEngine || !workerId || !videoRef.current || !canvasRef.current || !videoLoaded) {
+            return;
+        }
+
+        const now = Date.now();
+        if (now - lastDetectTimeRef.current < 250) { // Limit to 4 times per second
+            return;
+        }
+        lastDetectTimeRef.current = now;
+
+        try {
+            const img = new window.inferencejs.CVImage(videoRef.current);
+            let predictions = await inferEngine.infer(workerId, img);
+
+            // Sort predictions by confidence and remove duplicates
+            predictions = predictions
+                .sort((a, b) => b.confidence - a.confidence)
+                .filter((pred, index, self) =>
+                    index === self.findIndex((t) => t.class === pred.class) && pred.confidence >= CONFIDENCE_THRESHOLD
+                );
+
+            // Divide predictions into 3 zones
+            const canvasWidth = canvasRef.current.width;
+            const zoneWidth = canvasWidth / 3;
+            const zonedPredictions = [null, null, null];
+
+            predictions.forEach(pred => {
+                const zoneIndex = Math.floor(pred.bbox.x / zoneWidth);
+                if (zoneIndex >= 0 && zoneIndex < 3 && !zonedPredictions[zoneIndex]) {
+                    zonedPredictions[zoneIndex] = pred;
+                }
+            });
+
+            onPredictions(zonedPredictions);
+            renderPredictions(zonedPredictions);
+
+        } catch (error) {
+            console.error("Error predicting frame:", error);
+        }
+    }, [inferEngine, workerId, videoLoaded, onPredictions]);
+
+    useEffect(() => {
+        detectFrameRef.current = detectFrame;
+    }, [detectFrame]);
 
     useEffect(() => {
         const setupInference = async () => {
@@ -64,43 +114,53 @@ const Table = ({ onPredictions }) => {
     }, [selectedDeviceId]);
 
     useEffect(() => {
-        const predictFrame = async () => {
-            if (inferEngine && workerId && videoRef.current && canvasRef.current && videoLoaded) {
-                try {
-                    const img = new window.inferencejs.CVImage(videoRef.current);
-                    let predictions = await inferEngine.infer(workerId, img);
+        let animationFrameId;
 
-                    // Sort predictions by x-axis and remove duplicates
-                    predictions = predictions
-                        .sort((a, b) => a.bbox.x - b.bbox.x)
-                        .filter((pred, index, self) =>
-                            index === self.findIndex((t) => t.class === pred.class)
-                        );
-
-                    onPredictions(predictions);
-
-                    const ctx = canvasRef.current.getContext('2d');
-                    ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-
-                    const colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF'];
-                    predictions.forEach((pred, index) => {
-                        const color = colors[index % colors.length];
-                        ctx.strokeStyle = color;
-                        ctx.lineWidth = 2;
-                        ctx.strokeRect(pred.bbox.x, pred.bbox.y, pred.bbox.width, pred.bbox.height);
-                        ctx.fillStyle = color;
-                        ctx.fillText(`${pred.class} ${pred.confidence.toFixed(2)}`, pred.bbox.x, pred.bbox.y - 5);
-                    });
-                } catch (error) {
-                    console.error("Error predicting frame:", error);
-                }
-            }
-
-            requestAnimationFrame(predictFrame);
+        const animationLoop = () => {
+            detectFrameRef.current();
+            animationFrameId = requestAnimationFrame(animationLoop);
         };
 
-        predictFrame();
-    }, [inferEngine, workerId, videoLoaded, onPredictions]);
+        console.log("Starting prediction loop");
+        animationLoop();
+
+        return () => {
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+            }
+        };
+    }, []);
+
+    const renderPredictions = (predictions) => {
+        const ctx = canvasRef.current.getContext('2d');
+        ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+
+        const colors = ['#FF0000', '#00FF00', '#0000FF'];
+        const canvasWidth = canvasRef.current.width;
+        const canvasHeight = canvasRef.current.height;
+        const zoneWidth = canvasWidth / 3;
+
+        // Draw zone dividers
+        ctx.strokeStyle = 'black';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(zoneWidth, 0);
+        ctx.lineTo(zoneWidth, canvasHeight);
+        ctx.moveTo(zoneWidth * 2, 0);
+        ctx.lineTo(zoneWidth * 2, canvasHeight);
+        ctx.stroke();
+
+        predictions.forEach((pred, index) => {
+            if (pred) {
+                const color = colors[index];
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 2;
+                ctx.strokeRect(pred.bbox.x, pred.bbox.y, pred.bbox.width, pred.bbox.height);
+                ctx.fillStyle = color;
+                ctx.fillText(`${pred.class} ${pred.confidence.toFixed(2)}`, pred.bbox.x, pred.bbox.y - 5);
+            }
+        });
+    };
 
     const handleDeviceChange = (event) => {
         setVideoLoaded(false);

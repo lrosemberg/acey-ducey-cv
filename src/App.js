@@ -5,10 +5,11 @@ import Table from './components/table/Table';
 import Cards from './components/cards/Cards';
 import winnerGif from './assets/images/winner.gif';
 import loserGif from './assets/images/loser.gif';
+import { getCardColor, getSuitSymbol } from './utils/cardUtils';
 
 // Function to create the deck
 const createDeck = () => {
-  const suits = ['♦', '♠', '♥', '♣'];
+  const suits = ['D', 'S', 'H', 'C'];
   const values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
   let deck = [];
   suits.forEach((suit) => {
@@ -18,6 +19,16 @@ const createDeck = () => {
   });
   return deck;
 };
+
+// Function to map prediction class to card object
+const mapPredictionToCard = (predClass) => {
+  const value = predClass.slice(0, -1);
+  const suit = predClass.slice(-1);
+  return { value, suit };
+};
+
+// Used to determine the position of the cards on the table compared to the step
+const POSITION_MAP = [0, 2, 1];
 
 function App() {
   const [deck, setDeck] = useState(createDeck());
@@ -30,6 +41,7 @@ function App() {
   const [winningCards, setWinningCards] = useState([]);
   const [losingCards, setLosingCards] = useState([]);
   const [gameResult, setGameResult] = useState(null); // 'win', 'lose', or null
+  const [predictedCards, setPredictedCards] = useState([null, null, null]);
 
   useEffect(() => {
     // Calculate the probability whenever the first two cards are revealed
@@ -50,7 +62,7 @@ function App() {
     }
   }, [gameResult]);
 
-  const drawNextCard = () => {
+  const drawNextCard = (card, position) => {
     if (deck.length === 0) return;
 
     if (step === 3) {
@@ -61,44 +73,44 @@ function App() {
       setWinningCards([]);
       setLosingCards([]);
       setGameResult(null);
-      return;
     }
 
-    const newDeck = [...deck];
-    const randomIndex = Math.floor(Math.random() * newDeck.length);
-    const drawnCard = newDeck.splice(randomIndex, 1)[0];
+    if (position !== POSITION_MAP[step]) return; // Only draw if the card is in the correct position
+    if (playedCards.some(playedCard => playedCard.value === card.value && playedCard.suit === card.suit)) return; // Don't draw if the card has already been played
+
+    const newDeck = deck.filter(c => !(c.value === card.value && c.suit === card.suit));
     setDeck(newDeck);
 
     // If the first step reveals an Ace, prompt to choose high or low
-    if (step === 0 && drawnCard.value === 'A') {
+    if (step === 0 && card.value === 'A') {
       setAceBeingSelected(true);
-      setCurrentCards([drawnCard, null, null]);
-    } else if (step === 1 && drawnCard.value === 'A') {
-      // If the second card is an Ace, it's always the highest card
-      advanceStep({ ...drawnCard, value: 'A(H)' });
+      setCurrentCards([card, null, null]);
     } else {
-      advanceStep(drawnCard);
+      advanceStep(card);
     }
   };
 
   const advanceStep = (card) => {
     const newCards = [...currentCards];
-    newCards[step] = card;
+    newCards[POSITION_MAP[step]] = card;
     setCurrentCards(newCards);
     setPlayedCards([...playedCards, card]);
     setStep((prevStep) => prevStep < 3 ? prevStep + 1 : prevStep);
 
     // Check for win/lose condition when the third card is drawn
-    if (step === 2) {
-      checkGameResult([...newCards.slice(0, 2), card]);
+    if (step >= 2) {
+      checkGameResult(newCards);
     }
   };
 
   const checkGameResult = (cards) => {
-    const [card1, card2, card3] = cards;
+    const [card1, card3, card2] = cards; // Reorder cards to match the new positions
     const getValue = (card) => {
-      const order = ['A(L)', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A(H)'];
-      return order.indexOf(card.value);
+      if (card.value === 'A') {
+        return aceChoice === 'high' ? 14 : 1;
+      }
+      const order = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+      return order.indexOf(card.value) + 2;
     };
     const min = Math.min(getValue(card1), getValue(card2));
     const max = Math.max(getValue(card1), getValue(card2));
@@ -113,17 +125,19 @@ function App() {
 
   const selectAce = (choice) => {
     setAceChoice(choice);
-    const aceCard = { ...currentCards[0], value: `A(${choice === 'high' ? 'H' : 'L'})` };
-    advanceStep(aceCard);
+    advanceStep(currentCards[0]);
     setAceBeingSelected(false);
   };
 
   const calculateProbability = () => {
-    if (currentCards[0] && currentCards[1]) {
-      const [card1, card2] = currentCards;
+    if (currentCards[0] && currentCards[2]) {
+      const [card1, card2] = [currentCards[0], currentCards[2]];
       const getValue = (card) => {
-        const order = ['A(L)', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A(H)'];
-        return order.indexOf(card.value);
+        if (card.value === 'A') {
+          return aceChoice === 'high' ? 14 : 1;
+        }
+        const order = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+        return order.indexOf(card.value) + 2;
       };
       const min = Math.min(getValue(card1), getValue(card2));
       const max = Math.max(getValue(card1), getValue(card2));
@@ -138,11 +152,14 @@ function App() {
   };
 
   const updateWinningLosingCards = () => {
-    if (currentCards[0] && currentCards[1]) {
-      const [card1, card2] = currentCards;
+    if (currentCards[0] && currentCards[2]) {
+      const [card1, card2] = [currentCards[0], currentCards[2]];
       const getValue = (card) => {
-        const order = ['A(L)', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A(H)'];
-        return order.indexOf(card.value);
+        if (card.value === 'A') {
+          return aceChoice === 'high' ? 14 : 1;
+        }
+        const order = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+        return order.indexOf(card.value) + 2;
       };
       const min = Math.min(getValue(card1), getValue(card2));
       const max = Math.max(getValue(card1), getValue(card2));
@@ -167,10 +184,7 @@ function App() {
     setWinningCards([]);
     setLosingCards([]);
     setGameResult(null);
-  };
-
-  const getCardColor = (suit) => {
-    return suit === '♥' || suit === '♦' ? 'red' : 'black';
+    setPredictedCards([null, null, null]);
   };
 
   const getProbabilityColor = (probability) => {
@@ -181,14 +195,33 @@ function App() {
 
   const handlePredictions = (predictions) => {
     console.log('Predictions:', predictions);
+    const newPredictedCards = [...predictedCards];
+
+    predictions.forEach((pred, index) => {
+      if (!pred) return;
+
+      const card = mapPredictionToCard(pred.class);
+
+      // If the card has not been played yet, can be played
+      if (playedCards.some(playedCard => playedCard.value === card.value && playedCard.suit === card.suit)) {
+        return;
+      }
+
+      newPredictedCards[index] = pred;
+      drawNextCard(card, index);
+    });
+
+    setPredictedCards(newPredictedCards);
   };
+
+
 
   return (
     <div className="App">
       <div className="panels-container">
         <div className="side-panels">
-          <Panel title="Played Cards" cards={playedCards} getCardColor={getCardColor} />
-          <Panel title="Remaining Cards" cards={deck} getCardColor={getCardColor} />
+          <Panel title="Played Cards" cards={playedCards} />
+          <Panel title="Remaining Cards" cards={deck} />
         </div>
 
         <div className="center-panel">
@@ -197,22 +230,14 @@ function App() {
               <Table onPredictions={handlePredictions} />
             </div>
             <div className="cards-container">
-              <Cards 
-                currentCards={currentCards}
-                getCardColor={getCardColor}
-              />
+              <Cards currentCards={currentCards} />
             </div>
             <div className="commands-container">
-              {!aceBeingSelected && deck.length > 0 && (
-                <button onClick={drawNextCard}>
-                  {step === 3 ? 'Start New Round' : 'Flip next card'}
-                </button>
-              )}
               {aceBeingSelected && (
                 <div className="ace-choice-container">
-                  <p>Choose whether the Ace of {currentCards[0].suit} is "high" (H) or "low" (L):</p>
-                  <button onClick={() => selectAce('low')}>Low (L)</button>
-                  <button onClick={() => selectAce('high')}>High (H)</button>
+                  <p>Choose whether the Ace of <span style={{ color: getCardColor(currentCards[0].suit) }}>{getSuitSymbol(currentCards[0].suit)}</span> is "high" or "low":</p>
+                  <button onClick={() => selectAce('low')}>Low</button>
+                  <button onClick={() => selectAce('high')}>High</button>
                 </div>
               )}
               {winProbability && (
@@ -238,8 +263,8 @@ function App() {
         </div>
 
         <div className="side-panels">
-          <Panel title="Winning Cards" cards={winningCards} getCardColor={getCardColor} />
-          <Panel title="Losing Cards" cards={losingCards} getCardColor={getCardColor} />
+          <Panel title="Winning Cards" cards={winningCards} />
+          <Panel title="Losing Cards" cards={losingCards} />
         </div>
       </div>
     </div>
