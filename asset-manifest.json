@@ -1,16 +1,17 @@
 {
   "files": {
-    "main.css": "/acey-ducey-cv/static/css/main.d557dea6.css",
-    "main.js": "/acey-ducey-cv/static/js/main.70e93bdd.js",
+    "main.css": "/acey-ducey-cv/static/css/main.f08e157d.css",
+    "main.js": "/acey-ducey-cv/static/js/main.0df0ece5.js",
     "static/media/winner.gif": "/acey-ducey-cv/static/media/winner.db6b75dc6bef025a5c13.gif",
+    "static/media/logo.png": "/acey-ducey-cv/static/media/logo.8d25d2b27f29691b5a9d.png",
     "static/media/loser.gif": "/acey-ducey-cv/static/media/loser.4e90436f2473ec003f97.gif",
     "static/media/card-logo.png": "/acey-ducey-cv/static/media/card-logo.e0eb4b56a6968d37854b.png",
     "index.html": "/acey-ducey-cv/index.html",
-    "main.d557dea6.css.map": "/acey-ducey-cv/static/css/main.d557dea6.css.map",
-    "main.70e93bdd.js.map": "/acey-ducey-cv/static/js/main.70e93bdd.js.map"
+    "main.f08e157d.css.map": "/acey-ducey-cv/static/css/main.f08e157d.css.map",
+    "main.0df0ece5.js.map": "/acey-ducey-cv/static/js/main.0df0ece5.js.map"
   },
   "entrypoints": [
-    "static/css/main.d557dea6.css",
-    "static/js/main.70e93bdd.js"
+    "static/css/main.f08e157d.css",
+    "static/js/main.0df0ece5.js"
   ]
 }
