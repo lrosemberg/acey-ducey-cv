@@ -95,17 +95,24 @@ function App() {
     if (step === 0 && card.value === 'A') {
       setAceBeingSelected(true);
       setCurrentCards([card, null, null]);
+    } else if (step === 1 && card.value === 'A') {
+      // If it's the second card (index 2, step 1) and it's an Ace, it's always high
+      advanceStep(card, 'high');
     } else {
       advanceStep(card);
     }
   };
 
-  const advanceStep = (card) => {
+  const advanceStep = (card, aceValue = null) => {
     const newCards = [...currentCards];
     newCards[POSITION_MAP[step]] = card;
     setCurrentCards(newCards);
     setPlayedCards([...playedCards, card]);
     setStep((prevStep) => prevStep < 3 ? prevStep + 1 : prevStep);
+
+    if (aceValue) {
+      setAceChoice(aceValue);
+    }
 
     // Check for win/lose condition when the third card is drawn
     if (step >= 2) {
@@ -117,6 +124,7 @@ function App() {
     const [card1, card3, card2] = cards; // Reorder cards to match the new positions
     const getValue = (card) => {
       if (card.value === 'A') {
+        if (cards.indexOf(card) === 2) return 14; // Second card (index 2) Ace is always high
         return aceChoice === 'high' ? 14 : 1;
       }
       const order = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
@@ -135,7 +143,7 @@ function App() {
 
   const selectAce = (choice) => {
     setAceChoice(choice);
-    advanceStep(currentCards[0]);
+    advanceStep(currentCards[0], choice);
     setAceBeingSelected(false);
   };
 
@@ -144,6 +152,7 @@ function App() {
       const [card1, card2] = [currentCards[0], currentCards[2]];
       const getValue = (card) => {
         if (card.value === 'A') {
+          if (card === currentCards[2]) return 14; // Second card Ace is always high
           return aceChoice === 'high' ? 14 : 1;
         }
         const order = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
@@ -166,6 +175,7 @@ function App() {
       const [card1, card2] = [currentCards[0], currentCards[2]];
       const getValue = (card) => {
         if (card.value === 'A') {
+          if (card === currentCards[2]) return 14; // Second card Ace is always high
           return aceChoice === 'high' ? 14 : 1;
         }
         const order = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
@@ -254,8 +264,7 @@ function App() {
                 <div className="win-probability">
                   <span className="win-probability-label">Win probability: </span>
                   <span 
-                    className="win-probability-value"
-                    style={{ color: getProbabilityColor(parseFloat(winProbability)) }}
+                    className={`win-probability-value ${getProbabilityColor(parseFloat(winProbability))}`}
                   >
                     {winProbability}%
                   </span>
