@@ -193,10 +193,12 @@ function App() {
             <div className="table-container">
               <Table onPredictions={handlePredictions} />
             </div>
-            <Cards 
-              currentCards={currentCards}
-              getCardColor={getCardColor}
-            />
+            <div className="cards-container">
+              <Cards 
+                currentCards={currentCards}
+                getCardColor={getCardColor}
+              />
+            </div>
             <div className="commands-container">
               {!aceBeingSelected && deck.length > 0 && (
                 <button onClick={drawNextCard}>

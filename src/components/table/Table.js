@@ -7,13 +7,14 @@ const Table = ({ onPredictions }) => {
     const [inferEngine, setInferEngine] = useState(null);
     const [videoLoaded, setVideoLoaded] = useState(false);
     const [workerId, setWorkerId] = useState(null);
+    const [devices, setDevices] = useState([]);
+    const [selectedDeviceId, setSelectedDeviceId] = useState('');
 
     useEffect(() => {
         const setupInference = async () => {
             const engine = new window.inferencejs.InferenceEngine();
             setInferEngine(engine);
 
-            // const configuration = { scoreThreshold: 0.5, iouThreshold: 0.5, maxNumBoxes: 20 };
             const worker = await engine.startWorker(
                 "playing-cards-ow27d",
                 4,
@@ -32,41 +33,60 @@ const Table = ({ onPredictions }) => {
     }, []);
 
     useEffect(() => {
+        const getVideoDevices = async () => {
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            const videoDevices = devices.filter(device => device.kind === 'videoinput');
+            setDevices(videoDevices);
+            if (videoDevices.length > 0) {
+                setSelectedDeviceId(videoDevices[0].deviceId);
+            }
+        };
+
+        getVideoDevices();
+    }, []);
+
+    useEffect(() => {
         const setupWebcam = async () => {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-            if (videoRef.current) {
-                videoRef.current.srcObject = stream;
-                videoRef.current.onloadedmetadata = () => {
-                    setVideoLoaded(true);
-                };
+            if (selectedDeviceId) {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: { deviceId: { exact: selectedDeviceId } }
+                });
+                if (videoRef.current) {
+                    videoRef.current.srcObject = stream;
+                    videoRef.current.onloadedmetadata = () => {
+                        setVideoLoaded(true);
+                    };
+                }
             }
         };
 
         setupWebcam();
-    }, []);
+    }, [selectedDeviceId]);
 
     useEffect(() => {
         const predictFrame = async () => {
             if (inferEngine && workerId && videoRef.current && canvasRef.current && videoLoaded) {
-                const img = new window.inferencejs.CVImage(videoRef.current);
-                const predictions = await inferEngine.infer(workerId, img);
+                try {
+                    const img = new window.inferencejs.CVImage(videoRef.current);
+                    const predictions = await inferEngine.infer(workerId, img);
 
-                // Emit predictions using the React prop
-                onPredictions(predictions);
+                    onPredictions(predictions);
 
-                // Draw predictions on canvas
-                const ctx = canvasRef.current.getContext('2d');
-                ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+                    const ctx = canvasRef.current.getContext('2d');
+                    ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
 
-                const colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF'];
-                predictions.forEach((pred, index) => {
-                    const color = colors[index % colors.length];
-                    ctx.strokeStyle = color;
-                    ctx.lineWidth = 2;
-                    ctx.strokeRect(pred.bbox.x, pred.bbox.y, pred.bbox.width, pred.bbox.height);
-                    ctx.fillStyle = color;
-                    ctx.fillText(`${pred.class} ${pred.confidence.toFixed(2)}`, pred.bbox.x, pred.bbox.y - 5);
-                });
+                    const colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF'];
+                    predictions.forEach((pred, index) => {
+                        const color = colors[index % colors.length];
+                        ctx.strokeStyle = color;
+                        ctx.lineWidth = 2;
+                        ctx.strokeRect(pred.bbox.x, pred.bbox.y, pred.bbox.width, pred.bbox.height);
+                        ctx.fillStyle = color;
+                        ctx.fillText(`${pred.class} ${pred.confidence.toFixed(2)}`, pred.bbox.x, pred.bbox.y - 5);
+                    });
+                } catch (error) {
+                    console.error("Error predicting frame:", error);
+                }
             }
 
             requestAnimationFrame(predictFrame);
@@ -75,8 +95,22 @@ const Table = ({ onPredictions }) => {
         predictFrame();
     }, [inferEngine, workerId, videoLoaded, onPredictions]);
 
+    const handleDeviceChange = (event) => {
+        setVideoLoaded(false);
+        setSelectedDeviceId(event.target.value);
+    };
+
     return (
         <div className="table-container">
+            <div className="camera-select-overlay">
+                <select value={selectedDeviceId} onChange={handleDeviceChange}>
+                    {devices.map(device => (
+                        <option key={device.deviceId} value={device.deviceId}>
+                            {device.label || `Camera ${devices.indexOf(device) + 1}`}
+                        </option>
+                    ))}
+                </select>
+            </div>
             <video
                 ref={videoRef}
                 width="640"

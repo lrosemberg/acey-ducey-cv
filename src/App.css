@@ -46,6 +46,10 @@ button:focus {
   gap: 10px;
 }
 
+.table-container {
+  margin-bottom: 20px;
+}
+
 .side-panels {
   display: flex;
   flex-direction: column;
