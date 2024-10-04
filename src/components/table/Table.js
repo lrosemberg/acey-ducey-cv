@@ -84,6 +84,9 @@ const Table = ({ onPredictions }) => {
 
     useEffect(() => {
         const getVideoDevices = async () => {
+            await navigator.mediaDevices.getUserMedia({
+                video: true
+            });
             const devices = await navigator.mediaDevices.enumerateDevices();
             const videoDevices = devices.filter(device => device.kind === 'videoinput');
             setDevices(videoDevices);
