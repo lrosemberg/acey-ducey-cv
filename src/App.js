@@ -220,7 +220,7 @@ function App() {
     <div className="App">
       <div className="panels-container">
         <div className="side-panels">
-          <Panel title="Played Cards" cards={playedCards} />
+          <Panel title="Played Cards" cards={playedCards} grouped={false} />
           <Panel title="Remaining Cards" cards={deck} />
         </div>
 
