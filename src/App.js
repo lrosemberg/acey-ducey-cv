@@ -3,6 +3,7 @@ import './App.css';
 import Panel from './components/panel/Panel';
 import Table from './components/table/Table';
 import Cards from './components/cards/Cards';
+import ThemeToggle from './components/theme-toggle/ThemeToggle';
 import winnerGif from './assets/images/winner.gif';
 import loserGif from './assets/images/loser.gif';
 import { getCardColor, getSuitSymbol } from './utils/cardUtils';
@@ -42,6 +43,15 @@ function App() {
   const [losingCards, setLosingCards] = useState([]);
   const [gameResult, setGameResult] = useState(null); // 'win', 'lose', or null
   const [predictedCards, setPredictedCards] = useState([null, null, null]);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  const toggleTheme = () => {
+    setIsDarkMode(!isDarkMode);
+  };
+
+  useEffect(() => {
+    document.body.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+  }, [isDarkMode]);
 
   useEffect(() => {
     // Calculate the probability whenever the first two cards are revealed
@@ -249,6 +259,9 @@ function App() {
           </div>
           <div className="footer">
             <button onClick={resetGame}>Reset Game</button>
+            <div className="theme-toggle-container">
+              <ThemeToggle isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+            </div>
           </div>
           {gameResult === 'win' && (
             <div className="result-overlay fade-out">
