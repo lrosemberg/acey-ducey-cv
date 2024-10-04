@@ -88,6 +88,31 @@ button:focus {
   box-sizing: border-box;
 }
 
+@media (max-width: 1200px) {
+  .panels-container {
+    display: grid;
+    grid-template-columns: 100%;
+    gap: 10px;
+  }
+
+  .center-panel {
+    order: 1;
+    width: 100%;
+    height: auto;
+    min-height: 50vh;
+  }
+
+  .side-panels:first-of-type {
+    order: 2;
+    width: 100%;
+  }
+
+  .side-panels:last-of-type {
+    order: 3;
+    width: 100%;
+  }
+}
+
 .footer {
   width: 100%;
   display: flex;
